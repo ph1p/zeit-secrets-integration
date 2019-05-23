@@ -1,0 +1,7 @@
+{
+  "name": "zeit-secrets-integration",
+  "version": "1.0.0",
+  "dependencies": {
+    "@zeit/integration-utils": "latest"
+  }
+}
