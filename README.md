@@ -4,7 +4,7 @@
 
 ## zeit-secrets-integration
 
-This Integration is under development and allows you to manage your secrets on `zeit.co`
+This allows you to manage your secrets on `zeit.co`.
 
 This Application only uses the [zeit.co api](https://zeit.co/docs/api/) and does **not** safe any of your secret data!
 
@@ -19,10 +19,22 @@ This Application only uses the [zeit.co api](https://zeit.co/docs/api/) and does
 5. Now find it in your [Integrations Dashboard](https://zeit.co/dashboard/integrations)
 6. Click on **Untitled Configuration** and edit all your secrets (:
 
-### Screenshot
+### Screenshots
 
 <p align="center">
   <img src="./assets/screen1.png">
+</p>
+
+<p align="center">
+  <img src="./assets/screen2.png">
+</p>
+
+<p align="center">
+  <img src="./assets/screen3.png">
+</p>
+
+<p align="center">
+  <img src="./assets/screen4.png">
 </p>
 
 ### Development
