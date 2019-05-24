@@ -2,26 +2,38 @@ const { withUiHook, htm } = require('@zeit/integration-utils');
 const qs = require('querystring');
 const pkg = require('./package.json');
 const zeitApiClient = require('./zeit-api-client');
+const stringSimilarity = require('string-similarity');
 
 // components
 const SecretInput = require('./components/secret-input');
-const NowJson = require('./components/now-json');
+const { NowJson, generateEnvVariable } = require('./components/now-json');
 const DeleteConfirmation = require('./components/delete-confirmation');
-
-const Notification = ({ data }) => {
-  if (data.notify) {
-    const { type = 'message', message } = data.notify;
-
-    console.log(type, message);
-    return htm`<Notice type=${type}>${message}</Notice><BR />`;
-  }
-  return '';
-};
+const Notification = require('./components/notification');
 
 module.exports = withUiHook(async ({ payload, zeitClient }) => {
   const { clientState, action } = payload;
   const zac = zeitApiClient(zeitClient);
   const metadata = await zeitClient.getMetadata();
+
+  const deployments = (await Promise.all(
+    (await zac.getDeployments()).map(deployment =>
+      zac.getDeploymentById(deployment.uid)
+    )
+  ))
+    .filter(
+      deployment =>
+        (!deployment.error && (deployment.env && deployment.env.length > 0)) ||
+        (deployment.build && deployment.build.env.length > 0)
+    )
+    .map(({ env, build, builds, name, id, url, alias }) => ({
+      id,
+      name,
+      url,
+      env: env.filter(e => !e.startsWith('NOW_')),
+      build: build.env ? build.env.filter(e => !e.startsWith('NOW_')) : [],
+      alias
+    }))
+    .filter(d => d.alias && d.alias.length > 0);
 
   const resetNotification = async () => {
     delete metadata.notify;
@@ -118,42 +130,69 @@ module.exports = withUiHook(async ({ payload, zeitClient }) => {
 
   const isSecretListEmpty = !metadata.secrets || metadata.secrets.length === 0;
 
+  const getDeploymentsWithEnvironment = name =>
+    deployments.filter(({ url, env, build }) => {
+      const envName = generateEnvVariable(name);
+
+      return (
+        name &&
+        ((env.length > 0 &&
+          stringSimilarity.findBestMatch(envName, env).bestMatch.rating >
+            0.7) ||
+          (build.length > 0 &&
+            stringSimilarity.findBestMatch(envName, build).bestMatch.rating >
+              0.7))
+      );
+    });
+
+  const gridRow = htm`1 / span + ${
+    isSecretListEmpty ? metadata.secrets.length : 1
+  }`;
+
   return htm`<Page>
     <${Notification} data=${metadata} />
+
     <Box display="grid" gridTemplateColumns="repeat(2, 1fr)" gridGap="20px">
-      <Box gridRow="1 / span 2">
-        <H2>Secrets</H2>
-        <Box display="grid" gridGap="20px" overflow="auto">
-        ${
-          !isSecretListEmpty
-            ? metadata.secrets.map(
-                secret => htm`<${SecretInput} name=${secret.name} />`
-              )
-            : htm`<Fieldset><FsContent>You haven't created a secret yet. Create one on the right side.</FsContent></Fieldset>`
-        }
+      <Box>
+        <Box>
+          <H2>Secrets</H2>
+          <Box display="grid" gridGap="20px" overflow="auto">
+          ${
+            !isSecretListEmpty
+              ? metadata.secrets.map(({ name }) => {
+                  const envDeployments = getDeploymentsWithEnvironment(name);
+                  return htm`<${SecretInput} name=${name} deployments=${envDeployments} />`;
+                })
+              : htm`<Fieldset><FsContent>You haven't created a secret yet. Create one on the right side.</FsContent></Fieldset>`
+          }
+          </Box>
         </Box>
       </Box>
 
       <Box>
-        <Fieldset>
-          <FsContent>
-            <H2>Create a new secret</H2>
-            <Input name="secretName" label="Name" value="" placeholder="my-secret-env" />
-            <Textarea name="secretValue" label="Value" value="" placeholder="P@$$w0rd" width="350px" height="200px"></Textarea>
-          </FsContent>
-          <FsFooter>
-            <Button small action="//create-secret">+create</Button>
-          </FsFooter>
-        </Fieldset>
+        <Box marginBottom="20px">
+          <Fieldset>
+            <FsContent>
+              <H2>Create a new secret</H2>
+              <Input name="secretName" label="Name" value="" placeholder="my-secret-env" />
+              <Textarea name="secretValue" label="Value" value="" placeholder="P@$$w0rd" width="350px" height="200px"></Textarea>
+            </FsContent>
+            <FsFooter>
+              <Button small action="//create-secret">+create</Button>
+            </FsFooter>
+          </Fieldset>
+        </Box>
+
+        <Box>
+          <${NowJson} data=${metadata} />
+        </Box>
       </Box>
 
-      <Box>
-        <${NowJson} data=${metadata} />
+      <Box color="#999" textAlign="right" marginTop="15px" fontSize="12px" gridColumn="1 / span 2">
+        <P>version: <Link target="_blank" href="https://github.com/ph1p/zeit-secrets-integration">${
+          pkg.version
+        }</Link></P>
       </Box>
-    </Box>
-
-    <Box color="#999" textAlign="right" marginTop="15px" fontSize="12px">
-      <P>version: <Link href="https://github.com/ph1p/zeit-secrets-integration">${pkg.version}</Link></P>
     </Box>
 
   </Page>`;

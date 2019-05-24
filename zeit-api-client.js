@@ -13,6 +13,20 @@ module.exports = zeitClient => ({
     };
   },
 
+  async getDeploymentBuilds(id) {
+    const response = await zeitClient.fetch(`/v5/now/deployments/${id}/builds`, {
+      method: 'GET'
+    });
+
+    if (response.status === 200) {
+      return await response.json();
+    }
+
+    return {
+      error: 'There was an error'
+    };
+  },
+
   async getDeploymentFiles(id) {
     const response = await zeitClient.fetch(`/v5/now/deployments/${id}/files`, {
       method: 'GET'
@@ -115,6 +129,69 @@ module.exports = zeitClient => ({
       error: 'There was an error'
     };
   },
+
+  async changeSecretName(name, newName) {
+    if (!name || !newName) {
+      return {
+        error: 'Please enter a value'
+      };
+    }
+
+    const response = await zeitClient.fetch(`/v2/now/secrets/${name}`, {
+      method: 'PATCH',
+      data: {
+        name: newName
+      }
+    });
+
+    if (response.status === 200) {
+      return await response.json();
+    } else {
+      const {
+        error: { code, message }
+      } = await response.json();
+      return {
+        error: message
+      };
+    }
+
+    return {
+      error: 'There was an error'
+    };
+  },
+
+
+  async changeSecretValue(name, value) {
+    if (!name || !value) {
+      return {
+        error: 'Please enter a value'
+      };
+    }
+
+    const response = await zeitClient.fetch(`/v2/now/secrets`, {
+      method: 'POST',
+      data: {
+        name,
+        value
+      }
+    });
+
+    if (response.status === 200) {
+      return await response.json();
+    } else {
+      const {
+        error: { code, message }
+      } = await response.json();
+      return {
+        error: message
+      };
+    }
+
+    return {
+      error: 'There was an error'
+    };
+  },
+
 
   async deleteSecret(name) {
     if (!name) {
