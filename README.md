@@ -45,17 +45,16 @@ First add **[now-cli](https://github.com/zeit/now-cli)**
 yarn add global now # or npm install -g now
 ```
 
-Create an Integration at the [Integration Console](https://zeit.co/dashboard/integrations/console) and insert all necessary data.
-Set the **UI Hook URL** to **http://localhost:5005** and **Privacy** to **Private**.
-After clicking **CREATE**, you will see the **VIEW IN MARKETPLACE** button in the upper right corner.
-
-
-Click it and run the following
-
+1. Create an Integration at the [Integration Console](https://zeit.co/dashboard/integrations/console) and insert all necessary data.
+2. Set the **UI Hook URL** to **http://localhost:5005** and **Privacy** to **Private**.
+3. Click **CREATE**
+4. You will now see the **VIEW IN MARKETPLACE** button in the upper right corner. Click it and add your integration.
+5. Choose a user and go to [Integrations Dashboard](https://zeit.co/dashboard/integrations)
+6. Search the integration and click on **Untitled Configuration**.
+7. Run:
 ```bash
 yarn # or npm install
 #
 yarn dev # start the dev server on port 5005
 ```
-
-If the server is running, reload your integration page.
+and if the server is running, reload your integration page.
