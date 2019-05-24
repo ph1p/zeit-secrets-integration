@@ -1,6 +1,10 @@
 {
   "name": "zeit-secrets-integration",
   "version": "1.0.0",
+  "scripts": {
+    "deploy": "now --target=production",
+    "dev": "now dev -p 5005"
+  },
   "dependencies": {
     "@zeit/integration-utils": "latest"
   }
