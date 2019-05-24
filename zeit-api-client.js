@@ -14,9 +14,12 @@ module.exports = zeitClient => ({
   },
 
   async getDeploymentBuilds(id) {
-    const response = await zeitClient.fetch(`/v5/now/deployments/${id}/builds`, {
-      method: 'GET'
-    });
+    const response = await zeitClient.fetch(
+      `/v5/now/deployments/${id}/builds`,
+      {
+        method: 'GET'
+      }
+    );
 
     if (response.status === 200) {
       return await response.json();
@@ -31,6 +34,23 @@ module.exports = zeitClient => ({
     const response = await zeitClient.fetch(`/v5/now/deployments/${id}/files`, {
       method: 'GET'
     });
+
+    if (response.status === 200) {
+      return await response.json();
+    }
+
+    return {
+      error: 'There was an error'
+    };
+  },
+
+  async getDeploymentFile(id, fileId) {
+    const response = await zeitClient.fetch(
+      `/v5/now/deployments/${id}/files/${fileId}`,
+      {
+        method: 'GET'
+      }
+    );
 
     if (response.status === 200) {
       return await response.json();
@@ -160,7 +180,6 @@ module.exports = zeitClient => ({
     };
   },
 
-
   async changeSecretValue(name, value) {
     if (!name || !value) {
       return {
@@ -191,7 +210,6 @@ module.exports = zeitClient => ({
       error: 'There was an error'
     };
   },
-
 
   async deleteSecret(name) {
     if (!name) {

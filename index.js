@@ -15,25 +15,40 @@ module.exports = withUiHook(async ({ payload, zeitClient }) => {
   const zac = zeitApiClient(zeitClient);
   const metadata = await zeitClient.getMetadata();
 
-  const deployments = (await Promise.all(
-    (await zac.getDeployments()).map(deployment =>
-      zac.getDeploymentById(deployment.uid)
-    )
-  ))
-    .filter(
-      deployment =>
-        (!deployment.error && (deployment.env && deployment.env.length > 0)) ||
-        (deployment.build && deployment.build.env.length > 0)
-    )
-    .map(({ env, build, builds, name, id, url, alias }) => ({
-      id,
-      name,
-      url,
-      env: env.filter(e => !e.startsWith('NOW_')),
-      build: build.env ? build.env.filter(e => !e.startsWith('NOW_')) : [],
-      alias
+  // Search all now files
+  const nowFiles = [];
+  (await Promise.all(
+    (await zac.getDeployments()).map(async deployment => ({
+      ...deployment,
+      files: await zac.getDeploymentFiles(deployment.uid)
     }))
-    .filter(d => d.alias && d.alias.length > 0);
+  )).forEach(data => {
+    data.files.forEach(file => {
+      if (file.type === 'directory') {
+        file.children.forEach(({ name, uid }) => {
+          if (name === 'now.json') {
+            nowFiles.push({
+              ...data,
+              nowFileId: uid
+            });
+          }
+        });
+      }
+    });
+  });
+
+  // get all deployments
+  const deployments = await Promise.all(
+    nowFiles.map(async data => ({
+      ...data,
+      now: await zac.getDeploymentFile(data.uid, data.nowFileId)
+    }))
+  );
+
+  const getDeploymentsWithSecret = name =>
+    deployments.filter(
+      ({ now }) => JSON.stringify(now).includes('@' + name) || false
+    );
 
   const resetNotification = async () => {
     delete metadata.notify;
@@ -76,7 +91,7 @@ module.exports = withUiHook(async ({ payload, zeitClient }) => {
   if (action.startsWith('//confirm-delete')) {
     const name = action.replace('//confirm-delete-', '');
 
-    return htm`<${DeleteConfirmation} name=${name} />`;
+    return htm`<${DeleteConfirmation} deployments=${getDeploymentsWithSecret(name)} name=${name} />`;
   }
 
   if (action.startsWith('//delete-secret-')) {
@@ -130,21 +145,6 @@ module.exports = withUiHook(async ({ payload, zeitClient }) => {
 
   const isSecretListEmpty = !metadata.secrets || metadata.secrets.length === 0;
 
-  const getDeploymentsWithEnvironment = name =>
-    deployments.filter(({ url, env, build }) => {
-      const envName = generateEnvVariable(name);
-
-      return (
-        name &&
-        ((env.length > 0 &&
-          stringSimilarity.findBestMatch(envName, env).bestMatch.rating >
-            0.7) ||
-          (build.length > 0 &&
-            stringSimilarity.findBestMatch(envName, build).bestMatch.rating >
-              0.7))
-      );
-    });
-
   const gridRow = htm`1 / span + ${
     isSecretListEmpty ? metadata.secrets.length : 1
   }`;
@@ -160,7 +160,8 @@ module.exports = withUiHook(async ({ payload, zeitClient }) => {
           ${
             !isSecretListEmpty
               ? metadata.secrets.map(({ name }) => {
-                  const envDeployments = getDeploymentsWithEnvironment(name);
+                  const envDeployments = getDeploymentsWithSecret(name);
+
                   return htm`<${SecretInput} name=${name} deployments=${envDeployments} />`;
                 })
               : htm`<Fieldset><FsContent>You haven't created a secret yet. Create one on the right side.</FsContent></Fieldset>`
