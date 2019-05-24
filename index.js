@@ -190,9 +190,9 @@ module.exports = withUiHook(async ({ payload, zeitClient }) => {
         </Box>
       </Box>
 
-      <Box color="#999" textAlign="right" marginTop="15px" fontSize="12px" gridColumn="1 / span 2">
+      <Box color="#999" textAlign="right" fontSize="12px" gridColumn="1 / span 2">
         <P>version: <Link target="_blank" href=${'https://github.com/ph1p/zeit-secrets-integration/releases/tag/v' +
-          pkg.version}>v${pkg.version}</Link></P>
+          pkg.version}>${'v' + pkg.version}</Link></P>
       </Box>
     </Box>
 
