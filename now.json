@@ -1,6 +1,7 @@
 {
   "name": "zeit-secrets-integration",
   "version": 2,
+  "alias": ["secrets.now.sh"],
   "builds": [
     {
       "src": "index.js",
