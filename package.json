@@ -6,7 +6,6 @@
     "dev": "now dev -p 5005"
   },
   "dependencies": {
-    "@zeit/integration-utils": "latest",
-    "string-similarity": "^3.0.0"
+    "@zeit/integration-utils": "latest"
   }
 }

@@ -2,7 +2,6 @@ const { withUiHook, htm } = require('@zeit/integration-utils');
 const qs = require('querystring');
 const pkg = require('./package.json');
 const zeitApiClient = require('./zeit-api-client');
-const stringSimilarity = require('string-similarity');
 
 // components
 const SecretInput = require('./components/secret-input');
@@ -91,7 +90,9 @@ module.exports = withUiHook(async ({ payload, zeitClient }) => {
   if (action.startsWith('//confirm-delete')) {
     const name = action.replace('//confirm-delete-', '');
 
-    return htm`<${DeleteConfirmation} deployments=${getDeploymentsWithSecret(name)} name=${name} />`;
+    return htm`<${DeleteConfirmation} deployments=${getDeploymentsWithSecret(
+      name
+    )} name=${name} />`;
   }
 
   if (action.startsWith('//delete-secret-')) {
@@ -190,9 +191,8 @@ module.exports = withUiHook(async ({ payload, zeitClient }) => {
       </Box>
 
       <Box color="#999" textAlign="right" marginTop="15px" fontSize="12px" gridColumn="1 / span 2">
-        <P>version: <Link target="_blank" href="https://github.com/ph1p/zeit-secrets-integration">${
-          pkg.version
-        }</Link></P>
+        <P>version: <Link target="_blank" href=${'https://github.com/ph1p/zeit-secrets-integration/releases/tag/v' +
+          pkg.version}>v${pkg.version}</Link></P>
       </Box>
     </Box>
 
