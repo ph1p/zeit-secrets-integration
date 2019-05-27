@@ -19,11 +19,11 @@ module.exports = ({ name, deployments }) => {
         }
       </FsContent>
       <FsFooter>
-        <P>
-          <Button primary small action=${'//edit-secret-' + name}>save</Button>
-          <Button secondary small action=${'/confirm-delete/' +
+        <Box display="flex" justifyContent="space-between" width="100%">
+          <Button small secondary action=${'//edit-secret-' + name}>save</Button>
+          <Button float="right" small warning action=${'/confirm-delete/' +
             name}>delete</Button>
-        </P>
+        </Box>
       </FsFooter>
     </Fieldset>
   </Box>`;

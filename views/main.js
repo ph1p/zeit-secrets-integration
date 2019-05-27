@@ -46,7 +46,7 @@ module.exports = async ({ zeitClient, htm }) => {
             <Textarea name="secretValue" label="Value" value="" placeholder="P@$$w0rd" width="100%" height="200px"></Textarea>
           </FsContent>
           <FsFooter>
-            <Button small action="//create-secret">+ create</Button>
+            <Button highlight small action="//create-secret">+ create</Button>
           </FsFooter>
         </Fieldset>
       </Box>
