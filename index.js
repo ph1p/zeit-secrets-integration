@@ -1,24 +1,28 @@
 const { withUiHook, htm } = require('@zeit/integration-utils');
 const qs = require('querystring');
-const pkg = require('./package.json');
-const zeitApiClient = require('./zeit-api-client');
+const zeitApiClient = require('./libs/zeit-api-client');
 
 // components
-const SecretInput = require('./components/secret-input');
-const { NowJson, generateEnvVariable } = require('./components/now-json');
-const DeleteConfirmation = require('./components/delete-confirmation');
-const Notification = require('./components/notification');
+const DeleteConfirmation = require('./views/delete-confirmation');
+const Main = require('./views/main');
+const ZeitRouter = require('./libs/router');
 
-module.exports = withUiHook(async ({ payload, zeitClient }) => {
-  const { clientState, action } = payload;
+module.exports = withUiHook(async ctx => {
+  const { register, Router, navigate } = ZeitRouter(ctx);
+
+  const {
+    payload: { clientState, action },
+    zeitClient
+  } = ctx;
+
   const zac = zeitApiClient(zeitClient);
+
   const metadata = await zeitClient.getMetadata();
 
   const resetNotification = async () => {
     delete metadata.notify;
     await zeitClient.setMetadata(metadata);
   };
-
   await resetNotification();
 
   if (action.startsWith('//edit-secret-')) {
@@ -50,12 +54,6 @@ module.exports = withUiHook(async ({ payload, zeitClient }) => {
     }
 
     await zeitClient.setMetadata(metadata);
-  }
-
-  if (action.startsWith('//confirm-delete')) {
-    const name = action.replace('//confirm-delete-', '');
-
-    return await DeleteConfirmation(name, zac);
   }
 
   if (action.startsWith('//delete-secret-')) {
@@ -107,55 +105,10 @@ module.exports = withUiHook(async ({ payload, zeitClient }) => {
   metadata.secrets = await zac.getSecrets();
   await zeitClient.setMetadata(metadata);
 
-  const isSecretListEmpty = !metadata.secrets || metadata.secrets.length === 0;
-
-  const gridRow = htm`1 / span + ${
-    isSecretListEmpty ? metadata.secrets.length : 1
-  }`;
+  await register('/confirm-delete/:name', DeleteConfirmation);
+  await register('/', Main);
 
   return htm`<Page>
-    <${Notification} data=${metadata} />
-
-    <Box display="grid" gridTemplateColumns="repeat(2, 1fr)" gridGap="20px" margin="20px 0">
-      <Box>
-        <Box>
-          <H2>Secrets</H2>
-          <Box display="grid" gridGap="20px" overflow="auto">
-          ${
-            !isSecretListEmpty
-              ? metadata.secrets.map(({ name }) => {
-                  return htm`<${SecretInput} name=${name} deployments=${[]} />`;
-                })
-              : htm`<Fieldset><FsContent>You haven't created a secret yet. Create one on the right side.</FsContent></Fieldset>`
-          }
-          </Box>
-        </Box>
-      </Box>
-
-      <Box>
-        <Box marginBottom="20px">
-          <Fieldset>
-            <FsContent>
-              <H2>Create a new secret</H2>
-              <Input name="secretName" label="Name" value="" placeholder="my-secret-env" />
-              <Textarea name="secretValue" label="Value" value="" placeholder="P@$$w0rd" width="350px" height="200px"></Textarea>
-            </FsContent>
-            <FsFooter>
-              <Button small action="//create-secret">+create</Button>
-            </FsFooter>
-          </Fieldset>
-        </Box>
-
-        <Box>
-          <${NowJson} data=${metadata} />
-        </Box>
-      </Box>
-
-      <Box color="#999" textAlign="right" fontSize="12px" gridColumn="1 / span 2">
-        <P>version: <Link target="_blank" href=${'https://github.com/ph1p/zeit-secrets-integration/releases/tag/v' +
-          pkg.version}>${'v' + pkg.version}</Link></P>
-      </Box>
-    </Box>
-
+    ${await Router()}
   </Page>`;
 });

@@ -6,6 +6,7 @@
     "dev": "now dev -p 5005"
   },
   "dependencies": {
-    "@zeit/integration-utils": "latest"
+    "@zeit/integration-utils": "latest",
+    "route-parser": "^0.0.5"
   }
 }

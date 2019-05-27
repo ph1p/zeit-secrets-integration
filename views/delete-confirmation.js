@@ -1,6 +1,9 @@
-const { htm } = require('@zeit/integration-utils');
+const zeitApiClient = require('../libs/zeit-api-client');
 
-module.exports = async (name, zac) => {
+module.exports = async ({ zeitClient: client, params, htm }) => {
+  const zac = zeitApiClient(client);
+  const { name } = params;
+
   // Search all now files
   const nowFiles = [];
   (await Promise.all(

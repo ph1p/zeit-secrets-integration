@@ -2,23 +2,21 @@ const { htm } = require('@zeit/integration-utils');
 
 const generateEnvVariable = name => name.replace(/-/g, '_').toUpperCase();
 
-module.exports = {
-  generateEnvVariable,
-  NowJson({ data }) {
-    let jsonStr = {
-      env: []
-    };
+module.exports = ({ data }) => {
+  let jsonStr = {
+    env: []
+  };
 
-    if (data.secrets && data.secrets.length > 0) {
-      jsonStr.env = data.secrets.reduce(
-        (prev, { name }) => ({
-          ...prev,
-          [generateEnvVariable(name)]: '@' + name
-        }),
-        {}
-      );
+  if (data.secrets && data.secrets.length > 0) {
+    jsonStr.env = data.secrets.reduce(
+      (prev, { name }) => ({
+        ...prev,
+        [generateEnvVariable(name)]: '@' + name
+      }),
+      {}
+    );
 
-      return htm`
+    return htm`
     <Box>
       <Fieldset>
         <FsContent>
@@ -30,8 +28,7 @@ module.exports = {
         </FsContent>
       </Fieldset>
     </Box>`;
-    }
-
-    return '';
   }
+
+  return '';
 };

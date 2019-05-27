@@ -21,7 +21,7 @@ module.exports = ({ name, deployments }) => {
       <FsFooter>
         <P>
           <Button primary small action=${'//edit-secret-' + name}>save</Button>
-          <Button secondary small action=${'//confirm-delete-' +
+          <Button secondary small action=${'/confirm-delete/' +
             name}>delete</Button>
         </P>
       </FsFooter>
