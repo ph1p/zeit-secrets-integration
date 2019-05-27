@@ -5,7 +5,7 @@ module.exports = ({ name, deployments }) => {
   <Box>
     <Fieldset>
       <FsContent>
-        <Input width="300px" label="Name" name=${'input-' +
+        <Input width="100%" label="Name" name=${'input-' +
           name} value=${name} />
         ${
           deployments.length > 0

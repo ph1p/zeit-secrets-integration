@@ -1,8 +1,8 @@
-const { htm } = require('@zeit/integration-utils');
-
 const generateEnvVariable = name => name.replace(/-/g, '_').toUpperCase();
 
-module.exports = ({ data }) => {
+module.exports = async ({ zeitClient, htm }) => {
+  const data = await zeitClient.getMetadata();
+
   let jsonStr = {
     env: []
   };
@@ -20,7 +20,7 @@ module.exports = ({ data }) => {
     <Box>
       <Fieldset>
         <FsContent>
-          <H2>Example now.json</H2>
+          <H2>Generated now.json</H2>
           <Code width="200px">${JSON.stringify(jsonStr, undefined, 2)}</Code>
           <P>
             <Link href="https://zeit.co/docs/v2/deployments/environment-variables-and-secrets/#from-now.json">More Information</Link>

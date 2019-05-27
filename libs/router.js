@@ -14,10 +14,12 @@ module.exports = (ctx, defaultRoute = '/') => {
   const isMainRoute = action === 'view';
   const currentRoute = filterRoute(action);
 
+  const navigate = name => {
+    return routeName(name);
+  };
+
   return {
-    navigate(name) {
-      return routeName(name);
-    },
+    navigate,
     async register(name, view) {
       if (!routes[routeName(name)]) {
         routes[routeName(name)] = view;
@@ -45,6 +47,7 @@ module.exports = (ctx, defaultRoute = '/') => {
         return Comp.view({
           ...ctx,
           htm,
+          navigate,
           params: Comp.params
         });
       }
@@ -56,6 +59,7 @@ module.exports = (ctx, defaultRoute = '/') => {
       ]({
         ...ctx,
         htm,
+        navigate,
         params: {}
       });
     }
