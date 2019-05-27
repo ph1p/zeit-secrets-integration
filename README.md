@@ -33,10 +33,6 @@ This Application only uses the [zeit.co api](https://zeit.co/docs/api/) and does
   <img src="./assets/screen3.png">
 </p>
 
-<p align="center">
-  <img src="./assets/screen4.png">
-</p>
-
 ### Development
 
 First add **[now-cli](https://github.com/zeit/now-cli)**
