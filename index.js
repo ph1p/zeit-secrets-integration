@@ -101,10 +101,6 @@ module.exports = withUiHook(async ctx => {
     await zeitClient.setMetadata(metadata);
   }
 
-  // get secrets
-  metadata.secrets = await zac.getSecrets();
-  await zeitClient.setMetadata(metadata);
-
   await register('/confirm-delete/:name', DeleteConfirmation);
   await register('/', Main);
 
