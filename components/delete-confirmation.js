@@ -1,6 +1,37 @@
 const { htm } = require('@zeit/integration-utils');
 
-module.exports = ({ name, deployments }) => htm`<Box>
+module.exports = async (name, zac) => {
+  // Search all now files
+  const nowFiles = [];
+  (await Promise.all(
+    (await zac.getDeployments()).map(async deployment => ({
+      ...deployment,
+      files: await zac.getDeploymentFiles(deployment.uid)
+    }))
+  )).forEach(data => {
+    data.files.forEach(file => {
+      if (file.type === 'directory') {
+        file.children.forEach(({ name: fileName, uid }) => {
+          if (fileName === 'now.json') {
+            nowFiles.push({
+              ...data,
+              nowFileId: uid
+            });
+          }
+        });
+      }
+    });
+  });
+
+  // get all deployments
+  const deployments = (await Promise.all(
+    nowFiles.map(async data => ({
+      ...data,
+      now: await zac.getDeploymentFile(data.uid, data.nowFileId)
+    }))
+  )).filter(({ now }) => JSON.stringify(now).includes('@' + name) || false);
+
+  return htm`<Box>
   <Fieldset>
     <FsContent>
       Are you sure you want to delete <B>"${name}"</B>?
@@ -25,3 +56,4 @@ module.exports = ({ name, deployments }) => htm`<Box>
     </FsFooter>
   </Fieldset>
 </Box>`;
+};

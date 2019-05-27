@@ -14,41 +14,6 @@ module.exports = withUiHook(async ({ payload, zeitClient }) => {
   const zac = zeitApiClient(zeitClient);
   const metadata = await zeitClient.getMetadata();
 
-  // Search all now files
-  const nowFiles = [];
-  (await Promise.all(
-    (await zac.getDeployments()).map(async deployment => ({
-      ...deployment,
-      files: await zac.getDeploymentFiles(deployment.uid)
-    }))
-  )).forEach(data => {
-    data.files.forEach(file => {
-      if (file.type === 'directory') {
-        file.children.forEach(({ name, uid }) => {
-          if (name === 'now.json') {
-            nowFiles.push({
-              ...data,
-              nowFileId: uid
-            });
-          }
-        });
-      }
-    });
-  });
-
-  // get all deployments
-  const deployments = await Promise.all(
-    nowFiles.map(async data => ({
-      ...data,
-      now: await zac.getDeploymentFile(data.uid, data.nowFileId)
-    }))
-  );
-
-  const getDeploymentsWithSecret = name =>
-    deployments.filter(
-      ({ now }) => JSON.stringify(now).includes('@' + name) || false
-    );
-
   const resetNotification = async () => {
     delete metadata.notify;
     await zeitClient.setMetadata(metadata);
@@ -90,9 +55,7 @@ module.exports = withUiHook(async ({ payload, zeitClient }) => {
   if (action.startsWith('//confirm-delete')) {
     const name = action.replace('//confirm-delete-', '');
 
-    return htm`<${DeleteConfirmation} deployments=${getDeploymentsWithSecret(
-      name
-    )} name=${name} />`;
+    return await DeleteConfirmation(name, zac);
   }
 
   if (action.startsWith('//delete-secret-')) {
@@ -153,7 +116,7 @@ module.exports = withUiHook(async ({ payload, zeitClient }) => {
   return htm`<Page>
     <${Notification} data=${metadata} />
 
-    <Box display="grid" gridTemplateColumns="repeat(2, 1fr)" gridGap="20px">
+    <Box display="grid" gridTemplateColumns="repeat(2, 1fr)" gridGap="20px" margin="20px 0">
       <Box>
         <Box>
           <H2>Secrets</H2>
@@ -161,9 +124,7 @@ module.exports = withUiHook(async ({ payload, zeitClient }) => {
           ${
             !isSecretListEmpty
               ? metadata.secrets.map(({ name }) => {
-                  const envDeployments = getDeploymentsWithSecret(name);
-
-                  return htm`<${SecretInput} name=${name} deployments=${envDeployments} />`;
+                  return htm`<${SecretInput} name=${name} deployments=${[]} />`;
                 })
               : htm`<Fieldset><FsContent>You haven't created a secret yet. Create one on the right side.</FsContent></Fieldset>`
           }
