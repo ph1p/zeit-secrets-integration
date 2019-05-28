@@ -1,6 +1,6 @@
 {
   "name": "zeit-secrets-integration",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "scripts": {
     "deploy": "now --target=production",
     "dev": "now dev -p 5005"

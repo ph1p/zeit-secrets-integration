@@ -51,11 +51,11 @@ module.exports = async ({ zeitClient: client, params, htm }) => {
       }
     </FsContent>
     <FsFooter>
-      <P>
-        <Button secondary small action=${'//delete-secret-' +
+      <Box>
+        <Button warning small action=${'//delete-secret-' +
           name}>delete</Button>
-        <Button primary small action="view">cancel</Button>
-      </P>
+        <Button small secondary action="view">cancel</Button>
+      </Box>
     </FsFooter>
   </Fieldset>
 </Box>`;
