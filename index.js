@@ -19,10 +19,22 @@ module.exports = withUiHook(async ctx => {
   await register('/now-json', NowJson);
   await register('/', Main);
 
+
+  const activeHome =
+  payload.action === 'view' ||
+  payload.action === navigate('/') ||
+  payload.action.indexOf('//') !== -1;
+  const activeNow = payload.action.indexOf(navigate('/now-json')) !== -1;
+  const activeCreate =
+  payload.action.indexOf(navigate('/create-secret/')) !== -1;
+
+  const activeStyle = '2px solid #000';
+  const createButtonOpacity = activeCreate ? 0.2 : 1;
+
   return htm`<Page>
     <Box
-      margin="-86px 0 0 0"
-      padding="20px 0"
+      margin="-66px 0 0 0"
+      padding="10px 0 0"
       backgroundColor="#fff"
       borderWidth="0 0 1px 0"
       borderColor="rgb(234, 234, 234)"
@@ -30,30 +42,36 @@ module.exports = withUiHook(async ctx => {
       left="0"
       width="100%"
       position="absolute"
-      boxShadow="inset 0px 7px 10px -9px rgba(0,0,0,0.1)"
+      boxShadow="inset 0px 7px 10px -11px rgba(0,0,0,0.1)"
     >
-      <Box width="1040px" margin="0 auto" padding="0 20px" display="grid" gridTemplateColumns="auto auto 1fr" gridGap="20px">
-        <Box>
-          <Button action=${navigate('/')} highlight=${payload.action ===
-    'view' || payload.action.indexOf('//') !== -1} small>Secrets</Button>
-        </Box>
-        <Box>
-          <Button action=${navigate(
-            '/now-json'
-          )} highlight=${payload.action.indexOf('/now-json') !==
-    -1} small>now.json</Button>
+      <Box maxWidth="1040px" margin="0 auto" padding="0 20px" display="grid" gridTemplateColumns="auto auto 1fr" gridGap="20px">
+
+        <Box padding="0 5px 8px" borderBottom=${activeHome ? activeStyle : ''}>
+          <Link action=${navigate('/')}>
+            <Box color="#666">
+              Secrets
+            </Box>
+          </Link>
         </Box>
 
-        <Box textAlign="right">
+        <Box padding="0 5px 10px" borderBottom=${activeNow ? activeStyle : ''}>
+          <Link action=${navigate('/now-json')}>
+            <Box color="#666">
+              now.json
+            </Box>
+          </Link>
+        </Box>
+
+        <Box textAlign="right" opacity=${createButtonOpacity}>
           <Button action=${navigate(
             '/create-secret/form'
-          )} highlight=${payload.action.indexOf('/create-secret/') !==
-    -1} small>+ create</Button>
+          )} small>+ create</Button>
         </Box>
+
       </Box>
     </Box>
 
-    <Box marginTop="66px">
+    <Box marginTop="46px">
       ${await Router()}
     </Box>
 

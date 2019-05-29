@@ -15,13 +15,22 @@ module.exports = async ({ zeitClient, htm }) => {
       }),
       {}
     );
+  }
 
-    return htm`
+  return htm`
     <Box>
       <H2>Generated now.json</H2>
       <Fieldset>
         <FsContent>
-          <Code width="200px">${JSON.stringify(jsonStr, undefined, 2)}</Code>
+          ${
+            jsonStr.env.length > 0
+              ? htm`<Code width="200px">${JSON.stringify(
+                  jsonStr,
+                  undefined,
+                  2
+                )}</Code>`
+              : `First you have to create a secret, to get an example JSON.`
+          }
         </FsContent>
         <FsFooter>
           <Box>
@@ -30,7 +39,4 @@ module.exports = async ({ zeitClient, htm }) => {
         </FsFooter>
       </Fieldset>
     </Box>`;
-  }
-
-  return '';
 };
