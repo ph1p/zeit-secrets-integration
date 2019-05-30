@@ -72,9 +72,9 @@ module.exports = withUiHook(async ctx => {
       ${await Router()}
     </Box>
 
-    <Box color="#999" textAlign="right" fontSize="12px" marginTop="20px">
-      <P>version: <Link target="_blank" href=${'https://github.com/ph1p/zeit-secrets-integration/releases/tag/v' +
-        pkg.version}>${'v' + pkg.version}</Link></P>
+    <Box textAlign="right" fontSize="12px" marginTop="20px">
+      <P><Link target="_blank" href=${'https://github.com/ph1p/zeit-secrets-integration/releases/tag/v' +
+        pkg.version}><Box color="#b7b7b7">${'v' + pkg.version}</Box></Link></P>
     </Box>
   </Page>`;
 });
