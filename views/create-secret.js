@@ -28,6 +28,7 @@ module.exports = async ({ zeitClient, payload, htm, navigate }) => {
       };
     }
 
+    metadata.secrets = await zac.getSecrets();
     await zeitClient.setMetadata(metadata);
   }
 

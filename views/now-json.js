@@ -1,10 +1,17 @@
+// const zeitApiClient = require('../libs/zeit-api-client');
+
 const generateEnvVariable = name => name.replace(/-/g, '_').toUpperCase();
 
-module.exports = async ({ zeitClient, htm }) => {
+module.exports = async ({ zeitClient, htm, navigate }) => {
+  // const zac = zeitApiClient(zeitClient);
   const metadata = await zeitClient.getMetadata();
 
+  // // get secrets
+  // metadata.secrets = await zac.getSecrets();
+  // await zeitClient.setMetadata(metadata);
+
   let jsonStr = {
-    env: []
+    env: null
   };
 
   if (metadata.secrets && metadata.secrets.length > 0) {
@@ -23,13 +30,19 @@ module.exports = async ({ zeitClient, htm }) => {
       <Fieldset>
         <FsContent>
           ${
-            jsonStr.env.length > 0
+            jsonStr.env
               ? htm`<Code width="200px">${JSON.stringify(
                   jsonStr,
                   undefined,
                   2
                 )}</Code>`
-              : `First you have to create a secret, to get an example JSON.`
+              : htm`First you have to <Link action=${navigate(
+                  '/create-secret/form'
+                )}>
+              <B>
+                create
+              </B>
+            </Link> a secret to get an example JSON.`
           }
         </FsContent>
         <FsFooter>

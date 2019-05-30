@@ -19,14 +19,13 @@ module.exports = withUiHook(async ctx => {
   await register('/now-json', NowJson);
   await register('/', Main);
 
-
   const activeHome =
-  payload.action === 'view' ||
-  payload.action === navigate('/') ||
-  payload.action.indexOf('//') !== -1;
+    payload.action === 'view' ||
+    payload.action === navigate('/') ||
+    payload.action.indexOf('//') !== -1;
   const activeNow = payload.action.indexOf(navigate('/now-json')) !== -1;
   const activeCreate =
-  payload.action.indexOf(navigate('/create-secret/')) !== -1;
+    payload.action.indexOf(navigate('/create-secret/')) !== -1;
 
   const activeStyle = '2px solid #000';
   const createButtonOpacity = activeCreate ? 0.2 : 1;
@@ -45,7 +44,6 @@ module.exports = withUiHook(async ctx => {
       boxShadow="inset 0px 7px 10px -11px rgba(0,0,0,0.1)"
     >
       <Box maxWidth="1040px" margin="0 auto" padding="0 20px" display="grid" gridTemplateColumns="auto auto 1fr" gridGap="20px">
-
         <Box padding="0 5px 8px" borderBottom=${activeHome ? activeStyle : ''}>
           <Link action=${navigate('/')}>
             <Box color="#666">
@@ -62,12 +60,11 @@ module.exports = withUiHook(async ctx => {
           </Link>
         </Box>
 
-        <Box textAlign="right" opacity=${createButtonOpacity}>
+        <Box textAlign="right" marginTop="-2px" opacity=${createButtonOpacity}>
           <Button action=${navigate(
             '/create-secret/form'
           )} small>+ create</Button>
         </Box>
-
       </Box>
     </Box>
 

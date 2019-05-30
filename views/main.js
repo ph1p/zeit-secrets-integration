@@ -7,7 +7,8 @@ const Notification = require('../components/notification');
 module.exports = async ({
   zeitClient,
   payload: { action, clientState },
-  htm
+  htm,
+  navigate
 }) => {
   const zac = zeitApiClient(zeitClient);
   const metadata = await zeitClient.getMetadata();
@@ -80,7 +81,9 @@ module.exports = async ({
           ? metadata.secrets.map(({ name }) => {
               return htm`<${SecretInput} name=${name} deployments=${[]} />`;
             })
-          : htm`<Fieldset><FsContent>You haven't created a secret yet. Click on <B>+ CREATE</B> to add one or more. </FsContent></Fieldset>`
+          : htm`<Fieldset><FsContent>You haven't created a secret yet. Click on <Link action=${navigate(
+              '/create-secret/form'
+            )}><B>+ CREATE</B></Link> to add one or more. </FsContent></Fieldset>`
       }
       </Box>
     </Box>`;

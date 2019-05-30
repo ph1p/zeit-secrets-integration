@@ -8,5 +8,8 @@
   "dependencies": {
     "@zeit/integration-utils": "latest",
     "route-parser": "^0.0.5"
+  },
+  "prettier": {
+    "singleQuote": true
   }
 }
