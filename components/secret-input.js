@@ -5,8 +5,10 @@ module.exports = ({ name, deployments }) => {
   <Box>
     <Fieldset>
       <FsContent>
-        <Input width="100%" label="Name" name=${'input-' +
-          name} value=${name} />
+      <Input width="100%" label="Name" name=${'input-' +
+      name} value=${name} />
+      <Textarea width="100%" label="Value" placeholder="P@$$w0rd" name=${'textarea-' +
+      name} value="" />
         ${
           deployments.length > 0
             ? htm`<BR /><H2>Used in</H2>${deployments.map(

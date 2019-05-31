@@ -20,15 +20,18 @@ module.exports = async ({
   if (action.startsWith('//edit-secret-')) {
     const name = action.replace('//edit-secret-', '');
 
-    if (name === clientState['input-' + name]) {
+    if (name === clientState['input-' + name] && !clientState['textarea-' + name]) {
       metadata.notify = {
         message: `No changes. Old and new secret are equal.`
       };
     } else {
-      const res = await zac.changeSecretName(
-        name,
-        clientState['input-' + name]
-      );
+      let res;
+      if (!clientState['textarea-' + name]) {
+        res = await zac.changeSecretName(name, clientState['input-' + name]);
+      } else {
+        await zac.deleteSecret(name);
+        res = await zac.changeSecretValue(name, clientState['textarea-' + name]);
+      }
 
       if (!res || res.error) {
         metadata.notify = {
@@ -38,7 +41,7 @@ module.exports = async ({
       } else {
         metadata.notify = {
           type: 'success',
-          message: `Changed "${res.oldName}" to "${res.name}"`
+          message: clientState['textarea-' + name] ? `Changed the value of "${res.name}"` : `Changed "${res.oldName}" to "${res.name}"`
         };
       }
     }

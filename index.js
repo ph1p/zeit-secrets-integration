@@ -60,7 +60,7 @@ module.exports = withUiHook(async ctx => {
           </Link>
         </Box>
 
-        <Box textAlign="right" opacity=${createButtonOpacity}>
+        <Box marginTop="-2px" textAlign="right" opacity=${createButtonOpacity}>
           <Button action=${navigate(
             '/create-secret/form'
           )} small>+ create</Button>
