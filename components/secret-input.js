@@ -8,7 +8,7 @@ module.exports = ({ name, deployments }) => {
       <Input width="100%" label="Name" name=${'input-' +
       name} value=${name} />
       <Textarea width="100%" label="Value" placeholder="P@$$w0rd" name=${'textarea-' +
-      name} value="" />
+      name} value="" /><Box color="rgb(189, 189, 189)" fontSize="12px" margin="0">Leave it blank to only change the name</Box>
         ${
           deployments.length > 0
             ? htm`<BR /><H2>Used in</H2>${deployments.map(
