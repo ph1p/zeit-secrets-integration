@@ -1,10 +1,16 @@
 {
-  "name": "zeit-secrets-integration",
+  "name": "secrets",
   "version": 2,
   "alias": ["secrets.now.sh"],
+  "routes": [
+    {
+      "src": "/",
+      "dest": "src/index.ts"
+    }
+  ],
   "builds": [
     {
-      "src": "index.js",
+      "src": "./src/**/*.ts",
       "use": "@now/node"
     }
   ]

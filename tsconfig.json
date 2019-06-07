@@ -1,0 +1,18 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "esModuleInterop": true,
+    "lib": ["esnext", "dom"],
+    "module": "commonjs",
+    "resolveJsonModule": true,
+    "strictNullChecks": false,
+    "noImplicitAny": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "strict": true,
+    "target": "ES2017",
+    "typeRoots": ["./node_modules/@types"],
+    "outDir": "dist"
+  },
+  "include": ["src"]
+}

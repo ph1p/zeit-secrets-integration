@@ -1,15 +1,23 @@
 {
-  "name": "zeit-secrets-integration",
-  "version": "2.1.0",
+  "name": "zeit-integration-router",
+  "version": "3.0.0",
   "scripts": {
     "deploy": "now --target=production",
-    "dev": "now dev -p 5005"
+    "now:dev": "now dev -p 5005",
+    "build": "tsc ./src/libs/router --esModuleInterop --outDir ./dist",
+    "dev": "concurrently \"tsc -w\" \"nodemon --exec micro dist/src/index.js -l tcp://localhost:5005\""
   },
   "dependencies": {
     "@zeit/integration-utils": "latest",
-    "route-parser": "^0.0.5"
+    "zeit-router": "^0.0.1"
   },
   "prettier": {
     "singleQuote": true
+  },
+  "devDependencies": {
+    "@types/node-fetch": "^2.3.4",
+    "concurrently": "^4.1.0",
+    "micro": "^9.3.4",
+    "typescript": "^3.5.1"
   }
 }

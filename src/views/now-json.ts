@@ -1,22 +1,16 @@
-// const zeitApiClient = require('../libs/zeit-api-client');
+const generateEnvVariable = (name: string) =>
+  name.replace(/-/g, '_').toUpperCase();
 
-const generateEnvVariable = name => name.replace(/-/g, '_').toUpperCase();
+export async function NowJSON({ handler = <any>{}, htm: html = <any>{} }) {
+  const metadata = await handler.zeitClient.getMetadata();
 
-module.exports = async ({ zeitClient, htm, navigate }) => {
-  // const zac = zeitApiClient(zeitClient);
-  const metadata = await zeitClient.getMetadata();
-
-  // // get secrets
-  // metadata.secrets = await zac.getSecrets();
-  // await zeitClient.setMetadata(metadata);
-
-  let jsonStr = {
+  let jsonStr: any = {
     env: null
   };
 
   if (metadata.secrets && metadata.secrets.length > 0) {
     jsonStr.env = metadata.secrets.reduce(
-      (prev, { name }) => ({
+      (prev: any, { name }: { name: string }) => ({
         ...prev,
         [generateEnvVariable(name)]: '@' + name
       }),
@@ -24,21 +18,19 @@ module.exports = async ({ zeitClient, htm, navigate }) => {
     );
   }
 
-  return htm`
+  return html`
     <Box>
       <H2>Generated now.json</H2>
       <Fieldset>
         <FsContent>
           ${
             jsonStr.env
-              ? htm`<Code width="200px">${JSON.stringify(
-                  jsonStr,
-                  undefined,
-                  2
-                )}</Code>`
-              : htm`First you have to <Link action=${navigate(
-                  '/create-secret/form'
-                )}>
+              ? html`
+                  <Code width="200px">
+                    ${JSON.stringify(jsonStr, undefined, 2)}
+                  </Code>
+                `
+              : html`First you have to <Link action="/create-secret/form">
               <B>
                 create
               </B>
@@ -52,4 +44,4 @@ module.exports = async ({ zeitClient, htm, navigate }) => {
         </FsFooter>
       </Fieldset>
     </Box>`;
-};
+}

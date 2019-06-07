@@ -1,5 +1,7 @@
-module.exports = zeitClient => {
-  const request = async (url, options = {}, responseKey) => {
+import { ZeitClient } from '@zeit/integration-utils';
+
+export default function(zeitClient: ZeitClient) {
+  const request = async (url: string, options = {}, responseKey?: string) => {
     try {
       const response = await zeitClient.fetchAndThrow(url, {
         method: 'GET',
@@ -25,14 +27,16 @@ module.exports = zeitClient => {
   return {
     getDeployments: async () =>
       request('/v3/now/deployments', {}, 'deployments'),
-    getDeploymentBuilds: async id =>
+    getDeploymentBuilds: async (id: string) =>
       request(`/v5/now/deployments/${id}/builds`),
-    getDeploymentFiles: async id => request(`/v5/now/deployments/${id}/files`),
-    getDeploymentFile: async (id, fileId) =>
+    getDeploymentFiles: async (id: string) =>
+      request(`/v5/now/deployments/${id}/files`),
+    getDeploymentFile: async (id: string, fileId: string) =>
       request(`/v5/now/deployments/${id}/files/${fileId}`),
-    getDeploymentById: async id => request(`/v9/now/deployments/${id}`),
+    getDeploymentById: async (id: string) =>
+      request(`/v9/now/deployments/${id}`),
     getSecrets: async () => request('/v2/now/secrets', {}, 'secrets'),
-    createSecret: async (name, value) =>
+    createSecret: async (name: string, value: string) =>
       request('/v2/now/secrets', {
         method: 'POST',
         data: {
@@ -40,14 +44,14 @@ module.exports = zeitClient => {
           value
         }
       }),
-    changeSecretName: async (name, newName) =>
+    changeSecretName: async (name: string, newName: string) =>
       request(`/v2/now/secrets/${name}`, {
         method: 'PATCH',
         data: {
           name: newName
         }
       }),
-    changeSecretValue: async (name, value) =>
+    changeSecretValue: async (name: string, value: string) =>
       request('/v2/now/secrets', {
         method: 'POST',
         data: {
@@ -55,9 +59,9 @@ module.exports = zeitClient => {
           value
         }
       }),
-    deleteSecret: async name =>
+    deleteSecret: async (name: string) =>
       request(`/v2/now/secrets/${name}`, {
         method: 'DELETE'
       })
   };
-};
+}
