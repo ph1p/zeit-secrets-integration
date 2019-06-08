@@ -27,6 +27,7 @@ export default function(zeitClient: ZeitClient) {
   return {
     getDeployments: async () =>
       request('/v3/now/deployments', {}, 'deployments'),
+    getProjects: async () => request('/v1/projects/list', {}, 'projects'),
     getDeploymentBuilds: async (id: string) =>
       request(`/v5/now/deployments/${id}/builds`),
     getDeploymentFiles: async (id: string) =>

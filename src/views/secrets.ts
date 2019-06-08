@@ -3,6 +3,7 @@ import zeitApiClient from '../libs/zeit-api-client';
 // components
 import SecretInput from '../components/secret-input';
 import Notification from '../components/notification';
+import Deployments from '../components/deployments';
 
 export async function Secrets(view: any) {
   const { handler, htm: html, params, router } = view;
@@ -10,7 +11,6 @@ export async function Secrets(view: any) {
   const zac = zeitApiClient(handler.zeitClient);
   const metadata = await handler.zeitClient.getMetadata();
   const { clientState } = handler.payload;
-
 
   // get secrets
   metadata.secrets = await zac.getSecrets();
@@ -89,6 +89,20 @@ export async function Secrets(view: any) {
   return html`
     ${await Notification(metadata, handler.zeitClient)}<Box gridGap="20px">
       <H2>Secrets</H2>
+
+      ${params.action === 'information'
+        ? html`
+            <Box marginBottom="20px">
+              <Fieldset>
+                <FsContent>
+                  <H2>Used in</H2>
+                  ${await Deployments(params.name, handler.zeitClient)}
+                </FsContent>
+              </Fieldset>
+            </Box>
+          `
+        : ''}
+
       <Box
         display="grid"
         gridGap="20px"
@@ -98,7 +112,7 @@ export async function Secrets(view: any) {
         ${!isSecretListEmpty
           ? metadata.secrets.map(({ name }: { name: string }) => {
               return html`
-                <${SecretInput} name=${name} deployments=${[]} />
+                <${SecretInput} name=${name} />
               `;
             })
           : html`<Fieldset>

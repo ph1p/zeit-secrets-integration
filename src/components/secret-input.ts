@@ -1,12 +1,6 @@
 import { htm as html } from '@zeit/integration-utils';
 
-export default function ({
-  name,
-  deployments
-}: {
-  name: string;
-  deployments: Array<any>;
-}) {
+export default function({ name }: { name: string }) {
   return html`
     <Box>
       <Fieldset>
@@ -20,25 +14,15 @@ export default function ({
           <Textarea
             width="100%"
             label="Value"
-            placeholder="P@$$w0rd"
+            placeholder="Leave it blank to only change the name..."
             name=${'textarea-' + name}
             value=""
-          /><Box color="rgb(189, 189, 189)" fontSize="12px" margin="0"
-            >Leave it blank to only change the name</Box
-          >
-          ${deployments.length > 0
-            ? html`
-                <BR />
-                <H2>Used in</H2>
-                ${deployments.map(
-                  (d: any, k: number) =>
-                    html`<B><Link target="_blank" href="${'https://' +
-                      d.url}">${d.url}</Link></B>${
-                      k !== deployments.length - 1 ? ', ' : ''
-                    }`
-                )}
-              `
-            : ''}
+          />
+          <Box fontSize="12px" margin="0">
+            <Link action=${'/secrets/information/' + name}>
+              Show deployments that use this secret
+            </Link>
+          </Box>
         </FsContent>
         <FsFooter>
           <Box display="flex" justifyContent="space-between" width="100%">
@@ -58,4 +42,4 @@ export default function ({
       </Fieldset>
     </Box>
   `;
-};
+}
