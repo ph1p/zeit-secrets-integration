@@ -5,34 +5,32 @@ export default async function(name: string, client: ZeitClient) {
   const zac = zeitApiClient(client);
 
   // Search all now files
-  const nowFiles: object[] = [];
-  (await Promise.all(
-    (await zac.getDeployments()).map(async (deployment: any) => ({
-      ...deployment,
-      files: await zac.getDeploymentFiles(deployment.uid)
-    }))
-  )).forEach((data: any) => {
-    data.files.forEach((file: any) => {
-      if (file.type === 'directory') {
-        file.children.forEach((currentFile: any) => {
-          if (currentFile.name === 'now.json') {
-            nowFiles.push({
-              ...data,
-              nowFileId: currentFile.uid
-            });
-          }
-        });
+  const deployments: object[] = (await Promise.all(
+    (await Promise.all(
+      (await zac.getDeployments()).map(async (deployment: any) => ({
+        ...deployment,
+        files: await zac.getDeploymentFiles(deployment.uid)
+      }))
+    )).map(async (data: any) => {
+      const nowJSON = data.files
+        .filter((file: any) => file.type === 'directory')
+        .map((dir: any) =>
+          dir.children.filter((file: any) => file.name === 'now.json')
+        )
+        .flat();
+
+      if (nowJSON.length && nowJSON[0].uid) {
+        return {
+          ...data,
+          now: await zac.getDeploymentFile(data.uid, nowJSON[0].uid)
+        };
       }
-    });
+      return;
+    })
+  )).filter(data => {
+    return data && data.now ? JSON.stringify(data.now).includes('@' + name) : false;
   });
 
-  // get all deployments
-  const deployments = (await Promise.all(
-    nowFiles.map(async (data: any) => ({
-      ...data,
-      now: await zac.getDeploymentFile(data.uid, data.nowFileId)
-    }))
-  )).filter(({ now }) => JSON.stringify(now).includes('@' + name) || false);
 
   return deployments.length > 0
     ? html`
